@@ -105,6 +105,11 @@ public class AlunosView extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbAlunos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbAlunosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbAlunos);
 
         jLabel1.setText("Pesquisa:");
@@ -131,8 +136,18 @@ public class AlunosView extends javax.swing.JFrame {
         });
 
         btnAlterar.setText("Alterar");
+        btnAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlterarActionPerformed(evt);
+            }
+        });
 
         btnExcluir.setText("Excluir");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -229,8 +244,78 @@ public class AlunosView extends javax.swing.JFrame {
       }catch(SQLException ex){
           printStackTrace(ex.getMessage());
       }
+      
+      if(tbAlunos.getRowCount() > 0){
+          while(tbAlunos.getRowCount() > 0){
+              dtm.removeRow(0);
+          }
+      }
+      lista.clear();
       preencheTabela();
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarActionPerformed
+        Long matricula = Long.parseLong(txtMatricula.getText());
+      String nome = txtNome.getText();
+      String sexo = cbSexo.getSelectedItem().toString();
+      int idade = Integer.parseInt(txtIdade.getText());
+      
+      Connection con = Conexao.getConnection();
+      try{
+      String sql = "update alunos set nome = ?, sexo = ?,"
+              + " idade = ? where matricula = ?";
+      
+        PreparedStatement stm = con.prepareStatement(sql);
+        stm.setString(1, nome);
+        stm.setString(2, sexo);
+        stm.setInt(3, idade);
+        stm.setLong(4, matricula);
+        if(stm.executeUpdate() > 0){
+            JOptionPane.showMessageDialog(null, 
+                    "Alteração realizado com sucesso!");
+        }
+      }catch(SQLException ex){
+          printStackTrace(ex.getMessage());
+      }
+      
+      if(tbAlunos.getRowCount() > 0){
+          while(tbAlunos.getRowCount() > 0){
+              dtm.removeRow(0);
+          }
+      }
+      lista.clear();
+      preencheTabela();
+    }//GEN-LAST:event_btnAlterarActionPerformed
+
+    private void tbAlunosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbAlunosMouseClicked
+        int linha = tbAlunos.getSelectedRow();
+        txtMatricula.setText((String) tbAlunos.getValueAt(linha, 0));
+        txtNome.setText((String) tbAlunos.getValueAt(linha, 1));
+        txtIdade.setText((String) tbAlunos.getValueAt(linha, 3));
+        cbSexo.setSelectedItem((String) tbAlunos.getValueAt(linha, 2));
+    }//GEN-LAST:event_tbAlunosMouseClicked
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        try{
+            String sql = "delete from alunos where matricula = ?";
+            Connection con = Conexao.getConnection();
+            PreparedStatement stm = con.prepareStatement(sql);
+            stm.setLong(1, Integer.parseInt(txtMatricula.getText()));
+            if(stm.executeUpdate() > 0){
+                JOptionPane.showMessageDialog(null, "Registro excluído com sucesso");
+            }
+        }catch(SQLException ex){
+            printStackTrace(ex.getMessage());
+        }
+        if(tbAlunos.getRowCount() > 0){
+            while(tbAlunos.getRowCount() > 0){
+                dtm.removeRow(0);
+            }
+        }
+        lista.clear();
+        preencheTabela();
+        
+    }//GEN-LAST:event_btnExcluirActionPerformed
 
     /**
      * @param args the command line arguments
